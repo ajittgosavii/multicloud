@@ -41,41 +41,41 @@ def main():
     # CLOUD PROVIDER SELECTION - PROMINENT AT TOP
     # ========================================================================
     
-    # Purple gradient header - neutral for cloud selection
     st.markdown("""
     <div style="
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 30px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         text-align: center;
     ">
-        <h1 style="color: white; margin: 0; font-weight: 600;">
-            ☁️ CloudIDP Multi-Cloud Platform v3.0
+        <h1 style="color: white; margin: 0;">
+            ☁️ Multi-Cloud Infrastructure Platform
         </h1>
-        <p style="color: rgba(255,255,255,0.95); font-size: 1.1em; margin-top: 10px;">
-            Enterprise Cloud Infrastructure Development Platform
+        <p style="color: rgba(255,255,255,0.9); font-size: 1.1em; margin-top: 10px;">
+            Enterprise Cloud Management - AWS | Azure | GCP
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Cloud Provider Radio Buttons
-    st.markdown("### 🌐 Select Cloud Provider")
+    # Cloud Provider Radio Buttons - Large and Centered
+    st.markdown("### 🌐 Select Your Cloud Provider")
     
     # Initialize cloud provider if not set
     if 'cloud_provider' not in st.session_state:
         st.session_state.cloud_provider = 'AWS'
     
-    # Radio buttons for cloud selection
+    # Create columns for centered radio buttons
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
         provider = st.radio(
-            "Cloud Platform",
+            "Choose Cloud Platform:",
             options=["AWS", "Azure", "GCP"],
             horizontal=True,
-            key="cloud_selector"
+            key="cloud_selector",
+            label_visibility="visible"
         )
         
         # Update session state
@@ -83,28 +83,16 @@ def main():
             st.session_state.cloud_provider = provider
             st.rerun()
     
+    # Show provider info
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Apply theme and show cloud-specific header
     if st.session_state.cloud_provider == "AWS":
+        st.success("🔶 **AWS Mode Active** - Amazon Web Services modules loaded")
         AWSTheme.apply_aws_theme()
-        st.markdown(AWSTheme.aws_header(
-            "CloudIDP Multi-Cloud Platform",
-            "Enterprise Multi-Account Cloud Infrastructure Development Platform | AWS Mode"
-        ), unsafe_allow_html=True)
-        AWSTheme.aws_info_box(
-            "<strong>Amazon Web Services</strong> - Full feature set available"
-        )
         
     elif st.session_state.cloud_provider == "Azure":
+        st.info("🔷 **Azure Mode Active** - Microsoft Azure modules loaded")
         AzureTheme.apply_azure_theme()
-        st.markdown(AzureTheme.azure_header(
-            "CloudIDP Multi-Cloud Platform",
-            "Enterprise Multi-Subscription Cloud Infrastructure Development Platform | Azure Mode"
-        ), unsafe_allow_html=True)
-        AzureTheme.azure_info_box(
-            "<strong>Microsoft Azure</strong> - Full feature set available"
-        )
         
     elif st.session_state.cloud_provider == "GCP":
         st.warning("⚠️ **GCP Coming Soon** - Google Cloud Platform support in development")
@@ -114,11 +102,11 @@ def main():
         Google Cloud Platform integration is currently under development.
         
         **Available Now:**
-        - ✅ AWS (Full Support)
-        - ✅ Azure (Full Support)
+        - AWS (Full Support)
+        - Azure (Full Support)
         
         **Coming Soon:**
-        - 🔄 GCP (In Development)
+        - GCP (In Development)
         """)
         st.stop()
     
