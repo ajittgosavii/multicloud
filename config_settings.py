@@ -163,3 +163,63 @@ class AppConfig:
             }
         }
         return configs.get(provider, {})
+    
+    @staticmethod
+    def get_management_credentials() -> Dict:
+        """
+        Get AWS management credentials from Streamlit secrets or return demo credentials
+        
+        Returns:
+            Dict with access_key_id, secret_access_key, and region
+        """
+        import streamlit as st
+        
+        # Try to load from Streamlit secrets
+        try:
+            if 'aws' in st.secrets:
+                return {
+                    'access_key_id': st.secrets['aws'].get('aws_access_key_id', ''),
+                    'secret_access_key': st.secrets['aws'].get('aws_secret_access_key', ''),
+                    'region': st.secrets['aws'].get('aws_region', 'us-east-1')
+                }
+        except:
+            pass
+        
+        # Return demo credentials for demo mode
+        # Note: These are placeholder credentials and won't actually work with AWS
+        return {
+            'access_key_id': 'DEMO_ACCESS_KEY',
+            'secret_access_key': 'DEMO_SECRET_KEY',
+            'region': 'us-east-1'
+        }
+    
+    @staticmethod
+    def get_azure_credentials() -> Dict:
+        """
+        Get Azure credentials from Streamlit secrets or return demo credentials
+        
+        Returns:
+            Dict with subscription_id, tenant_id, client_id, and client_secret
+        """
+        import streamlit as st
+        
+        # Try to load from Streamlit secrets
+        try:
+            if 'azure' in st.secrets:
+                return {
+                    'subscription_id': st.secrets['azure'].get('subscription_id', ''),
+                    'tenant_id': st.secrets['azure'].get('tenant_id', ''),
+                    'client_id': st.secrets['azure'].get('client_id', ''),
+                    'client_secret': st.secrets['azure'].get('client_secret', '')
+                }
+        except:
+            pass
+        
+        # Return demo credentials for demo mode
+        # Note: These are placeholder credentials and won't actually work with Azure
+        return {
+            'subscription_id': 'DEMO-SUBSCRIPTION-ID',
+            'tenant_id': 'DEMO-TENANT-ID',
+            'client_id': 'DEMO-CLIENT-ID',
+            'client_secret': 'DEMO-CLIENT-SECRET'
+        }

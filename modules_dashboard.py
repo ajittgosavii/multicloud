@@ -67,6 +67,10 @@ class DashboardModule:
             st.error("❌ AWS account manager not configured. Please check secrets.toml")
             return
         
+        # Show demo mode indicator if in demo mode
+        if hasattr(account_mgr, 'demo_mode') and account_mgr.demo_mode:
+            st.info("📊 **Demo Mode** - Displaying sample data. Configure AWS credentials in Settings to view live data.")
+        
         # Load accounts
         accounts = AppConfig.load_aws_accounts()
         active_accounts = [acc for acc in accounts if acc.status == 'active']

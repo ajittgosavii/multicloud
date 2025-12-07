@@ -31,12 +31,24 @@ class AWSAccountManager:
         """
         self.management_credentials = management_credentials
         self._session_cache = {}
-        self._sts_client = boto3.client(
-            'sts',
-            aws_access_key_id=management_credentials['access_key_id'],
-            aws_secret_access_key=management_credentials['secret_access_key'],
-            region_name=management_credentials.get('region', 'us-east-1')
-        )
+        
+        # Check if in demo mode (credentials start with DEMO_)
+        self.demo_mode = management_credentials.get('access_key_id', '').startswith('DEMO_')
+        
+        if not self.demo_mode:
+            try:
+                self._sts_client = boto3.client(
+                    'sts',
+                    aws_access_key_id=management_credentials['access_key_id'],
+                    aws_secret_access_key=management_credentials['secret_access_key'],
+                    region_name=management_credentials.get('region', 'us-east-1')
+                )
+            except Exception as e:
+                st.warning(f"⚠️ Could not initialize AWS client: {str(e)}. Running in demo mode.")
+                self.demo_mode = True
+                self._sts_client = None
+        else:
+            self._sts_client = None
     
     def assume_role(
         self, 
@@ -59,6 +71,10 @@ class AWSAccountManager:
         Returns:
             AssumedRoleSession if successful, None otherwise
         """
+        # In demo mode, return a mock session
+        if self.demo_mode:
+            return self._create_demo_session(account_id, account_name)
+        
         # Handle empty role_arn - use management credentials directly
         if not role_arn or role_arn.strip() == "":
             return self._create_direct_session(account_id, account_name)
@@ -119,6 +135,32 @@ class AWSAccountManager:
             st.error(f"❌ Unexpected error assuming role in {account_name}: {str(e)}")
             return None
     
+    def _create_demo_session(self, account_id: str, account_name: str) -> Optional[AssumedRoleSession]:
+        """
+        Create a demo session for demonstration purposes (no real AWS connection)
+        
+        Args:
+            account_id: Target AWS account ID
+            account_name: Friendly name for the account
+        
+        Returns:
+            Mock AssumedRoleSession for demo mode
+        """
+        # Create a mock session object for demo purposes
+        role_session = AssumedRoleSession(
+            account_id=account_id,
+            account_name=account_name,
+            credentials={
+                'AccessKeyId': 'DEMO_ACCESS_KEY',
+                'SecretAccessKey': 'DEMO_SECRET_KEY',
+                'SessionToken': None
+            },
+            expiration=datetime.now(timezone.utc) + timedelta(hours=24),
+            session=None  # No real session in demo mode
+        )
+        
+        return role_session
+    
     def _create_direct_session(self, account_id: str, account_name: str) -> Optional[AssumedRoleSession]:
         """
         Create a session using management credentials directly (no role assumption)
@@ -130,6 +172,10 @@ class AWSAccountManager:
         Returns:
             AssumedRoleSession using management credentials
         """
+        # In demo mode, return mock session
+        if self.demo_mode:
+            return self._create_demo_session(account_id, account_name)
+        
         try:
             # Create session with management credentials
             direct_session = boto3.Session(
