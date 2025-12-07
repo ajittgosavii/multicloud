@@ -10,11 +10,12 @@ class Navigation:
     """Main application navigation with multi-cloud support"""
     
     @staticmethod
-    def render():
+    def render(cloud_provider=None):
         """Render main navigation with cloud provider awareness"""
         
-        # Get cloud provider from session state
-        cloud_provider = st.session_state.get('cloud_provider', 'AWS')
+        # Get cloud provider from session state or parameter
+        if cloud_provider is None:
+            cloud_provider = st.session_state.get('cloud_provider', 'AWS')
         
         # Initialize active module in session state
         if 'active_module' not in st.session_state:

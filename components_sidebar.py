@@ -12,14 +12,15 @@ class GlobalSidebar:
     """Global sidebar with cloud provider-aware filters and controls"""
     
     @staticmethod
-    def render():
+    def render(cloud_provider=None):
         """Render global sidebar based on selected cloud provider"""
         
         # Initialize session state first
         SessionManager.initialize()
         
-        # Get cloud provider
-        cloud_provider = st.session_state.get('cloud_provider', 'AWS')
+        # Get cloud provider from parameter or session state
+        if cloud_provider is None:
+            cloud_provider = st.session_state.get('cloud_provider', 'AWS')
         
         with st.sidebar:
             # Cloud Provider Display
